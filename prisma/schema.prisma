@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Token {
+  BRL
+  BTC
+  ETH
+}
+
+enum LedgerType {
+  DEPOSIT
+  WITHDRAWAL
+  SWAP_IN
+  SWAP_OUT
+  SWAP_FEE
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  wallet    Wallet?
+  createdAt DateTime @default(now())
+}
+
+model Wallet {
+  id        String       @id @default(uuid())
+  user      User         @relation(fields: [userId], references: [id])
+  userId    String       @unique
+  ledger    LedgerEntry[]
+  createdAt DateTime     @default(now())
+}
+
+model LedgerEntry {
+  id          String     @id @default(uuid())
+  wallet      Wallet     @relation(fields: [walletId], references: [id])
+  walletId    String
+  type        LedgerType
+  token       Token
+  amount      Float      // valor movimentado (+ ou -)
+  balanceBefore Float
+  balanceAfter  Float
+  transaction Transaction? @relation(fields: [transactionId], references: [id])
+  transactionId String?
+  createdAt   DateTime   @default(now())
+}
+
+model Transaction {
+  id        String        @id @default(uuid())
+  type      LedgerType    // SWAP, DEPOSIT, WITHDRAWAL
+  ledger    LedgerEntry[]
+  createdAt DateTime      @default(now())
+}
+
+model IdempotencyKey {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  createdAt DateTime @default(now())
+}
