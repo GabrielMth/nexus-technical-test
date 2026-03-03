@@ -10,7 +10,7 @@ import { WalletNotFoundException } from 'src/common/exceptions/wallet-not-found.
 import { InsufficientBalanceException } from 'src/common/exceptions/insufficient-balance.exception';
 import { SameTokenException } from 'src/common/exceptions/same-token.exception';
 
-const FEE_RATE = new Prisma.Decimal('0.015'); // 1.5%
+const FEE_RATE = new Prisma.Decimal('0.015');
 
 @Injectable()
 export class SwapService {
@@ -30,14 +30,16 @@ export class SwapService {
     const amount = new Prisma.Decimal(dto.amount);
     const fee = amount.mul(FEE_RATE);
     const toAmount = amount.mul(new Prisma.Decimal(rate));
+    const fromDecimals = dto.fromToken === 'BRL' ? 2 : 8;
+    const toDecimals = dto.toToken === 'BRL' ? 2 : 8;
 
     return {
       fromToken: dto.fromToken,
       toToken: dto.toToken,
-      amount: amount.toString(),
-      toAmount: toAmount.toDecimalPlaces(8).toString(),
-      fee: fee.toDecimalPlaces(8).toString(),
-      rate: rate.toString(),
+      amount: amount.toDecimalPlaces(fromDecimals).toString(),
+      toAmount: toAmount.toDecimalPlaces(toDecimals).toString(),
+      fee: fee.toDecimalPlaces(fromDecimals).toString(),
+      rate: new Prisma.Decimal(rate).toDecimalPlaces(8).toString(),
     };
   }
 
@@ -56,12 +58,13 @@ export class SwapService {
     const fee = amount.mul(FEE_RATE);
     const totalDeducted = amount.plus(fee);
     const toAmount = amount.mul(new Prisma.Decimal(rate));
+    const fromDecimals = dto.fromToken === 'BRL' ? 2 : 8;
+    const toDecimals = dto.toToken === 'BRL' ? 2 : 8;
 
     return this.prisma.$transaction(async (tx) => {
       const wallet = await tx.wallet.findUnique({ where: { userId } });
       if (!wallet) throw new WalletNotFoundException();
 
-      // valid balance
       const lastEntry = await tx.ledgerEntry.findFirst({
         where: { walletId: wallet.id, token: dto.fromToken as Token },
         orderBy: { createdAt: 'desc' },
@@ -73,7 +76,6 @@ export class SwapService {
       if (currentBalance.lt(totalDeducted))
         throw new InsufficientBalanceException();
 
-      // new transaction
       const transaction = await tx.transaction.create({
         data: {
           walletId: wallet.id,
@@ -141,10 +143,10 @@ export class SwapService {
         success: true,
         fromToken: dto.fromToken,
         toToken: dto.toToken,
-        fromAmount: totalDeducted.toDecimalPlaces(8).toString(),
-        toAmount: toAmount.toDecimalPlaces(8).toString(),
-        fee: fee.toDecimalPlaces(8).toString(),
-        rate: rate.toString(),
+        fromAmount: totalDeducted.toDecimalPlaces(fromDecimals).toString(),
+        toAmount: toAmount.toDecimalPlaces(toDecimals).toString(),
+        fee: fee.toDecimalPlaces(fromDecimals).toString(),
+        rate: new Prisma.Decimal(rate).toDecimalPlaces(8).toString(),
       };
     });
   }

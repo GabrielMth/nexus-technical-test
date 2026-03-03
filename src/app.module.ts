@@ -10,6 +10,7 @@ import { AuthMiddleware } from './common/middleware/auth.middleware';
 import { WalletModule } from './modules/wallet/wallet.module';
 import { WebhooksModule } from './modules/webhooks/webhook.module';
 import { RedisModule } from './common/cache/redis.module';
+import { SwapModule } from './modules/swap/swap.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { RedisModule } from './common/cache/redis.module';
     UsersModule,
     WalletModule,
     WebhooksModule,
+    SwapModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'secret_key',
       signOptions: { expiresIn: '15m' },
