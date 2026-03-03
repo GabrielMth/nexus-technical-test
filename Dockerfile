@@ -7,7 +7,7 @@ RUN npm ci
 
 COPY . .
 
-RUN npx prisma generate
+RUN DATABASE_URL="postgresql://fake:fake@localhost:5432/fake" npx prisma generate
 RUN npm run build
 
 EXPOSE 3000
