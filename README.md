@@ -1,12 +1,16 @@
 # Nexus Wallet API
 
 Core Backend desenvolvido para um teste técnico, consiste em uma carteira cripto simplificada com suporte a depósitos, swaps, cotação entre tokens e saques.
-Há taxas (Fee) de 1.5% para swaps, a taxa é cobrada do token de saida. 
-Exemplo: 
-amount:        100.00 BRL  (quanto você quer converter)
-fee:             1.50 BRL  (1.5% de 100)
-totalDeducted: 101.50 BRL  (debitado da sua carteira)
-toAmount:    0.00027896 BTC (quanto você recebe)
+
+> **Taxa de swap:** 1.5% cobrada sobre o token de origem.
+
+**Exemplo BRL → BTC:**
+| | |
+|---|---|
+| `amount` | 100.00 BRL — valor a converter |
+| `fee` | 1.50 BRL — 1.5% de 100 |
+| `totalDeducted` | 101.50 BRL — debitado da carteira |
+| `toAmount` | 0.00027896 BTC — valor recebido |
 
 ---
 
