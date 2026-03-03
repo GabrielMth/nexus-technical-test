@@ -1,5 +1,6 @@
 import { PipeTransform, Injectable, BadRequestException } from '@nestjs/common';
 import type { ZodType } from 'zod';
+import { InvalidTokenException } from '../exceptions/invalid-token.exception';
 
 @Injectable()
 export class ZodValidationPipe<T> implements PipeTransform {
@@ -9,18 +10,14 @@ export class ZodValidationPipe<T> implements PipeTransform {
     const result = this.schema.safeParse(value);
 
     if (!result.success) {
-      const messages: string[] = [];
+      const isInvalidToken = result.error.issues.some(
+        (issue) =>
+          issue.path.includes('token') && issue.code === 'invalid_value',
+      );
 
-      const formatted = result.error.format() as Record<
-        string,
-        { _errors?: string[] }
-      >;
+      if (isInvalidToken) throw new InvalidTokenException();
 
-      Object.values(formatted).forEach((field) => {
-        if (field._errors && field._errors.length > 0) {
-          messages.push(...field._errors);
-        }
-      });
+      const messages = result.error.issues.map((issue) => issue.message);
 
       throw new BadRequestException(messages);
     }

@@ -19,6 +19,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@nestjs/cache-manager": "^3.1.0",
     "@nestjs/common": "^11.0.1",
     "@nestjs/core": "^11.0.1",
     "@nestjs/jwt": "^11.0.2",
@@ -26,6 +27,9 @@
     "@prisma/adapter-pg": "^7.4.2",
     "@prisma/client": "^7.4.2",
     "@types/pg": "^8.18.0",
+    "axios": "^1.13.6",
+    "cache-manager": "^7.2.8",
+    "ioredis": "^5.10.0",
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.19.0",
     "prisma": "^7.4.2",
