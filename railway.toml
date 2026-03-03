@@ -7,4 +7,4 @@ startCommand = "npx prisma migrate deploy && npm run start:prod"
 restartPolicyType = "on_failure"
 
 [variables]
-NIXPACKS_NODE_VERSION = "20"
+NIXPACKS_NODE_VERSION = "22.12"
