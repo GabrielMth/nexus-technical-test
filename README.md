@@ -92,7 +92,7 @@ Toda alteração de saldo gera um `LedgerEntry` com `balanceBefore` e `balanceAf
 Agrupa múltiplos `LedgerEntry` em uma única operação lógica. Um swap gera 3 entradas no ledger (SWAP_OUT, SWAP_FEE, SWAP_IN) todas linkadas ao mesmo `transactionId`.
 
 ### Redis
-Utilizado para cache de cotações da CoinGecko com TTL de 60 segundos, evitando chamadas repetidas à API externa e respeitando os limites do plano gratuito.
+Utilizado para cache de cotações da CoinGecko com TTL de 60 segundos, evitando chamadas repetidas à API externa e respeitando os limites do plano gratuito, dessa forma pode realizar somente quando necessário.
 
 ### Idempotência no depósito
 A tabela `IdempotencyKey` garante que o mesmo depósito não seja processado duas vezes, mesmo que o webhook seja chamado múltiplas vezes com a mesma chave.
@@ -168,7 +168,7 @@ POST /users/register
 **Body:**
 ```json
 {
-  "email": "user@example.com",
+  "email": "wallet@nexus.com",
   "password": "senha123"
 }
 ```
@@ -176,10 +176,12 @@ POST /users/register
 ```json
 {
   "id": "uuid",
-  "email": "user@example.com",
+  "email": "wallet@nexus.com",
   "createdAt": "2026-03-03T00:00:00.000Z"
 }
 ```
+**Erros:**
+- `400` — email inválido, senha com menos de 6 caracteres ou email já cadastrado
 
 ---
 
@@ -190,7 +192,7 @@ POST /users/login
 **Body:**
 ```json
 {
-  "email": "user@example.com",
+  "email": "wallet@nexus.com",
   "password": "senha123"
 }
 ```
@@ -198,11 +200,13 @@ POST /users/login
 ```json
 {
   "message": "Login OK!",
-  "email": "user@example.com",
+  "email": "wallet@nexus.com",
   "accessToken": "eyJ...",
   "refreshToken": "eyJ..."
 }
 ```
+**Erros:**
+- `401` — usuário não encontrado ou senha incorreta
 
 ---
 
@@ -210,7 +214,7 @@ POST /users/login
 
 #### Consultar saldos
 ```
-GET /wallet/balances
+GET /wallet/balance
 Authorization: Bearer <token>
 ```
 **Response 200:**
@@ -223,6 +227,8 @@ Authorization: Bearer <token>
   ]
 }
 ```
+**Erros:**
+- `404` — carteira não encontrada
 
 ---
 
@@ -335,6 +341,7 @@ Authorization: Bearer <token>
 ```
 **Erros:**
 - `400` — saldo insuficiente ou valor inválido
+- `404` — carteira não encontrada
 
 ---
 
@@ -389,7 +396,8 @@ Authorization: Bearer <token>
   "limit": 10
 }
 ```
-
+**Erros:**
+- `404` — carteira não encontrada
 ---
 
 ### Histórico de Transações
@@ -432,10 +440,6 @@ Authorization: Bearer <token>
   "limit": 10
 }
 ```
-
+**Erros:**
+- `404` — carteira não encontrada
 ---
-
-## Diferenciais entregues
-
-- ✅ **Redis** — cache de cotações da CoinGecko com TTL de 60s
-- ✅ **Rate Limiting** — 30 requests/minuto por IP via `@nestjs/throttler`
