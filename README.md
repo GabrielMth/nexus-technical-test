@@ -106,6 +106,9 @@ A tabela `IdempotencyKey` garante que o mesmo depósito não seja processado dua
 ### Rate Limiting
 Implementado via `@nestjs/throttler` com limite de 30 requests por minuto por IP, protegendo contra abuso dos endpoints.
 
+### CORS 
+Não foi implementado CORS por conta que não deu tempo para uma aplicação frontend porém também seria possível...
+
 ---
 
 ## Estrutura do Banco de Dados
@@ -162,11 +165,17 @@ erDiagram
 ```
 
 ---
-Table IdempotencyKey: garante a idempotência, quando estamos falando de webhook pode ser que dispare eventos mais de uma vez, vai de quem está recebendo validar.
-Table User: Entidade central do sistema, armazena credenciais de acesso com senha hasheada via bcrypt. Separada da table wallet para seguir o princípio de responsabilidade, autenticação é regra diferente que finanças.
-Tablet Wallet: separada do user pois tem um ciclo de vida e relacionamentos com transações , idempotências e etc. assim permitindo suportar múltiplas carteiras por usuário sem alterar nada futuramente. (pensado mais em escalabilidade mesmo)
-Table LedgerEntry: Coração do sistema financeiro. Toda alteração de saldo gera um registro imutável com balanceBefore e balanceAfter. Inspirado no modelo de ledger contábil, o saldo nunca é um campo mutável, é sempre calculado a partir das movimentações. dessa forma sempre garantindo auditabilidade total e rastreabilidade de cada centavinho.
-Table Transaction: Agrupa múltiplos LedgerEntry em uma operação lógica única, pois um Swap sem essa tabela iria gerar 3 ENTRADAS no ledger sem contexto, com ela é possível responder , quais foram as transações do usuário, de forma limpa. 
+## Motivação das Tabelas
+
+**IdempotencyKey:** Garante a idempotência — quando estamos falando de webhook, pode ser que dispare eventos mais de uma vez, vai de quem está recebendo validar.
+
+**User:** Entidade central do sistema. Armazena credenciais de acesso com senha hasheada via bcrypt. Separada da Wallet para seguir o princípio de responsabilidade única — autenticação é uma regra diferente de finanças.
+
+**Wallet:** Separada do User pois tem seu próprio ciclo de vida e relacionamentos com transações, idempotências e etc. Permite suportar múltiplas carteiras por usuário no futuro sem alterar nada — pensado mais em escalabilidade.
+
+**LedgerEntry:** Coração do sistema financeiro. Toda alteração de saldo gera um registro imutável com `balanceBefore` e `balanceAfter`. Inspirado no modelo de ledger contábil — o saldo nunca é um campo mutável, é sempre calculado a partir das movimentações, garantindo auditabilidade total e rastreabilidade de cada centavinho.
+
+**Transaction:** Agrupa múltiplos `LedgerEntry` em uma operação lógica única. Um swap sem essa tabela geraria 3 entradas no ledger sem contexto. Com ela é possível responder "quais foram as transações do usuário?" de forma limpa.
 
 
 ## Endpoints
