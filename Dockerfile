@@ -8,8 +8,8 @@ RUN npm ci
 COPY . .
 
 RUN DATABASE_URL="postgresql://fake:fake@localhost:5432/fake" npx prisma generate
-RUN npm run build || (echo "BUILD FAILED" && cat /app/dist 2>/dev/null && exit 1)
-RUN ls -la /app/dist/ || echo "DIST NOT FOUND"
+RUN rm -f tsconfig.build.tsbuildinfo && npm run build
+RUN ls -la /app/dist/
 
 EXPOSE 3000
 
