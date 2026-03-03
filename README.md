@@ -1,6 +1,12 @@
 # Nexus Wallet API
 
 Core Backend desenvolvido para um teste técnico, consiste em uma carteira cripto simplificada com suporte a depósitos, swaps, cotação entre tokens e saques.
+Há taxas (Fee) de 1.5% para swaps, a taxa é cobrada do token de saida. 
+Exemplo: 
+amount:        100.00 BRL  (quanto você quer converter)
+fee:             1.50 BRL  (1.5% de 100)
+totalDeducted: 101.50 BRL  (debitado da sua carteira)
+toAmount:    0.00027896 BTC (quanto você recebe)
 
 ---
 
@@ -156,6 +162,12 @@ erDiagram
 ```
 
 ---
+Table IdempotencyKey: garante a idempotência, quando estamos falando de webhook pode ser que dispare eventos mais de uma vez, vai de quem está recebendo validar.
+Table User: Entidade central do sistema, armazena credenciais de acesso com senha hasheada via bcrypt. Separada da table wallet para seguir o princípio de responsabilidade, autenticação é regra diferente que finanças.
+Tablet Wallet: separada do user pois tem um ciclo de vida e relacionamentos com transações , idempotências e etc. assim permitindo suportar múltiplas carteiras por usuário sem alterar nada futuramente. (pensado mais em escalabilidade mesmo)
+Table LedgerEntry: Coração do sistema financeiro. Toda alteração de saldo gera um registro imutável com balanceBefore e balanceAfter. Inspirado no modelo de ledger contábil, o saldo nunca é um campo mutável, é sempre calculado a partir das movimentações. dessa forma sempre garantindo auditabilidade total e rastreabilidade de cada centavinho.
+Table Transaction: Agrupa múltiplos LedgerEntry em uma operação lógica única, pois um Swap sem essa tabela iria gerar 3 ENTRADAS no ledger sem contexto, com ela é possível responder , quais foram as transações do usuário, de forma limpa. 
+
 
 ## Endpoints
 
