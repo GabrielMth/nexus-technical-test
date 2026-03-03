@@ -11,9 +11,11 @@ import { WalletModule } from './modules/wallet/wallet.module';
 import { WebhooksModule } from './modules/webhooks/webhook.module';
 import { RedisModule } from './common/cache/redis.module';
 import { SwapModule } from './modules/swap/swap.module';
+import { WithdrawalsModule } from './modules/withdrawals/withdrawals.module';
 
 @Module({
   imports: [
+    WithdrawalsModule,
     RedisModule,
     UsersModule,
     WalletModule,
