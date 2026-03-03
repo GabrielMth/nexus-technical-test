@@ -1,98 +1,441 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Nexus Wallet API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Core Backend desenvolvido para um teste técnico, consiste em uma carteira cripto simplificada com suporte a depósitos, swaps, cotação entre tokens e saques.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## Stack
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **Node.js** v20.19.0
+- **NestJS** v11
+- **TypeScript**
+- **PostgreSQL** + **Prisma** v7.4.2
+- **Zod** — Validação de dados
+- **Redis** — Cache de cotações
+- **JWT** — Autenticação
 
-## Project setup
+---
+
+## Como rodar localmente
+
+Projeto foi configurado para rodar localmente, menos o Redis que foi apontado para uma VM particular.
+Caso desejar também pode utilizá-la para realizar o teste, ou trocar o valor da variável no `.env` do projeto.
+
+### Instalação
 
 ```bash
-$ npm install
+git clone https://github.com/GabrielMth/nexus-technical-test
+cd nexus-wallet
+npm install
 ```
 
-## Compile and run the project
+### Variáveis de Ambiente
+
+Foi commitado um `.env.example`, crie um arquivo `.env` na raiz do projeto para rodar localmente.
+
+Os valores do `JWT_SECRET` e `REFRESH_TOKEN_SECRET` podem ser gerados com:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 ```
 
-## Run tests
+```env
+# Prisma
+DATABASE_URL="postgresql://postgres:senha@localhost:5432/nexus_wallet?schema=public"
+
+# JWT
+JWT_SECRET=
+REFRESH_TOKEN_SECRET=
+JWT_EXPIRES_IN="3600s"
+REFRESH_TOKEN_EXPIRES_IN="7d"
+
+# Redis
+REDIS_HOST=localhost       // caso desejar utilizar minha vps aberta 187.33.200.196 , mesma porta.
+REDIS_PORT=6379
+```
+
+### Banco de dados
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npx prisma migrate dev
+npx prisma generate
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### Rodar o projeto
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npm run start:dev
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+A API estará disponível em `http://localhost:3000`.
 
-## Resources
+---
 
-Check out a few resources that may come in handy when working with NestJS:
+## Decisões Técnicas
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### NestJS
+Escolhi NestJS por já ter experiência com Java/Spring Boot — a arquitetura é muito similar (módulos, injeção de dependência, decorators/annotations/metadados). A transição foi natural e permitiu aplicar os mesmos conceitos de separação de responsabilidade que uso no ecossistema Java, porém com o ganho de performance do Node.js.
 
-## Support
+### Prisma
+Diferente do Hibernate/JPA onde as entidades são classes anotadas, o Prisma usa um schema declarativo que gera tipagem automática. Me lembrou muito o Flyway que utilizo hoje em dia — realiza o versionamento com histórico de alterações.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### Zod
+Praticamente igual ao Bean Validation do Java — valida as bordas da aplicação via pipes, equivalente aos `@RequestBody` do Spring. A vantagem é a inferência de tipos TypeScript automática a partir do schema.
 
-## Stay in touch
+### Transações Atômicas
+O `$transaction` do Prisma cumpre o mesmo papel do `@Transactional` do Spring — garante que operações como swap (3 ledger entries) sejam atômicas, fazendo rollback automático em caso de falha.
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### Modelo de Ledger
+Toda alteração de saldo gera um `LedgerEntry` com `balanceBefore` e `balanceAfter`. Isso garante auditabilidade total — o saldo atual pode ser reconstruído a partir das movimentações sem depender de um campo de saldo mutável.
 
-## License
+### Tabela Transaction
+Agrupa múltiplos `LedgerEntry` em uma única operação lógica. Um swap gera 3 entradas no ledger (SWAP_OUT, SWAP_FEE, SWAP_IN) todas linkadas ao mesmo `transactionId`.
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+### Redis
+Utilizado para cache de cotações da CoinGecko com TTL de 60 segundos, evitando chamadas repetidas à API externa e respeitando os limites do plano gratuito.
+
+### Idempotência no depósito
+A tabela `IdempotencyKey` garante que o mesmo depósito não seja processado duas vezes, mesmo que o webhook seja chamado múltiplas vezes com a mesma chave.
+
+### Rate Limiting
+Implementado via `@nestjs/throttler` com limite de 30 requests por minuto por IP, protegendo contra abuso dos endpoints.
+
+---
+
+## Estrutura do Banco de Dados
+
+```mermaid
+erDiagram
+    User {
+        String id PK
+        String email UK
+        String password
+        DateTime createdAt
+    }
+
+    Wallet {
+        String id PK
+        String userId FK
+        DateTime createdAt
+    }
+
+    LedgerEntry {
+        String id PK
+        String walletId FK
+        String transactionId FK
+        LedgerType type
+        Token token
+        Decimal amount
+        Decimal balanceBefore
+        Decimal balanceAfter
+        DateTime createdAt
+    }
+
+    Transaction {
+        String id PK
+        String walletId FK
+        TransactionType type
+        Token fromToken
+        Token toToken
+        Decimal amount
+        Decimal fee
+        DateTime createdAt
+    }
+
+    IdempotencyKey {
+        String key PK
+        String walletId FK
+        DateTime createdAt
+    }
+
+    User ||--o| Wallet : "has one"
+    Wallet ||--o{ LedgerEntry : "has many"
+    Wallet ||--o{ Transaction : "has many"
+    Wallet ||--o{ IdempotencyKey : "has many"
+    Transaction ||--o{ LedgerEntry : "has many"
+```
+
+---
+
+## Endpoints
+
+### Autenticação
+
+#### Registrar usuário
+```
+POST /users/register
+```
+**Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "senha123"
+}
+```
+**Response 201:**
+```json
+{
+  "id": "uuid",
+  "email": "user@example.com",
+  "createdAt": "2026-03-03T00:00:00.000Z"
+}
+```
+
+---
+
+#### Login
+```
+POST /users/login
+```
+**Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "senha123"
+}
+```
+**Response 200:**
+```json
+{
+  "message": "Login OK!",
+  "email": "user@example.com",
+  "accessToken": "eyJ...",
+  "refreshToken": "eyJ..."
+}
+```
+
+---
+
+### Carteira
+
+#### Consultar saldos
+```
+GET /wallet/balances
+Authorization: Bearer <token>
+```
+**Response 200:**
+```json
+{
+  "balances": [
+    { "token": "BRL", "balance": "258.50" },
+    { "token": "BTC", "balance": "0.00083328" },
+    { "token": "ETH", "balance": "0" }
+  ]
+}
+```
+
+---
+
+### Depósito (Webhook)
+
+#### Processar depósito
+```
+POST /webhooks/deposit
+```
+> Rota pública — simula notificação de serviço externo, não requer autenticação JWT.
+
+**Body:**
+```json
+{
+  "userId": "uuid-do-usuario",
+  "token": "BRL",
+  "amount": "100.00",
+  "idempotencyKey": "chave-unica-001"
+}
+```
+**Response 200:**
+```json
+{
+  "success": true,
+  "token": "BRL",
+  "balance": "358.50"
+}
+```
+**Erros:**
+- `404` — carteira não encontrada
+- `400` — token inválido ou valor inválido
+- `409` — depósito já processado (idempotencyKey duplicada)
+
+---
+
+### Swap
+
+#### Cotar swap
+```
+GET /swap/quote?fromToken=BRL&toToken=BTC&amount=1000
+Authorization: Bearer <token>
+```
+**Response 200:**
+```json
+{
+  "fromToken": "BRL",
+  "toToken": "BTC",
+  "amount": "1000.00",
+  "toAmount": "0.00277421",
+  "fee": "15.00",
+  "rate": "0.00000277"
+}
+```
+
+---
+
+#### Executar swap
+```
+POST /swap/execute
+Authorization: Bearer <token>
+```
+**Body:**
+```json
+{
+  "fromToken": "BRL",
+  "toToken": "BTC",
+  "amount": "100"
+}
+```
+**Response 200:**
+```json
+{
+  "success": true,
+  "fromToken": "BRL",
+  "toToken": "BTC",
+  "fromAmount": "101.50",
+  "toAmount": "0.00027896",
+  "fee": "1.50",
+  "rate": "0.00000279"
+}
+```
+**Erros:**
+- `400` — saldo insuficiente, tokens iguais ou valor inválido
+- `503` — CoinGecko ou Redis indisponível
+
+---
+
+### Saque
+
+#### Solicitar saque
+```
+POST /withdrawals
+Authorization: Bearer <token>
+```
+**Body:**
+```json
+{
+  "token": "BRL",
+  "amount": "50"
+}
+```
+**Response 200:**
+```json
+{
+  "success": true,
+  "token": "BRL",
+  "amount": "50.00",
+  "balanceAfter": "5.50"
+}
+```
+**Erros:**
+- `400` — saldo insuficiente ou valor inválido
+
+---
+
+### Ledger (Extrato)
+
+#### Consultar extrato de movimentações
+```
+GET /ledger?page=1&limit=10
+Authorization: Bearer <token>
+```
+**Response 200:**
+```json
+{
+  "data": [
+    {
+      "transactionId": "uuid",
+      "type": "SWAP",
+      "createdAt": "2026-03-03T17:15:11.373Z",
+      "entries": [
+        {
+          "id": "uuid",
+          "type": "SWAP_OUT",
+          "token": "BRL",
+          "amount": "100",
+          "balanceBefore": "360",
+          "balanceAfter": "260",
+          "createdAt": "2026-03-03T17:15:11.379Z"
+        },
+        {
+          "id": "uuid",
+          "type": "SWAP_FEE",
+          "token": "BRL",
+          "amount": "1.5",
+          "balanceBefore": "260",
+          "balanceAfter": "258.5",
+          "createdAt": "2026-03-03T17:15:11.383Z"
+        },
+        {
+          "id": "uuid",
+          "type": "SWAP_IN",
+          "token": "BTC",
+          "amount": "0.00027896",
+          "balanceBefore": "0",
+          "balanceAfter": "0.00027896",
+          "createdAt": "2026-03-03T17:15:11.390Z"
+        }
+      ]
+    }
+  ],
+  "total": 6,
+  "page": 1,
+  "limit": 10
+}
+```
+
+---
+
+### Histórico de Transações
+
+#### Listar transações
+```
+GET /transactions?page=1&limit=10
+Authorization: Bearer <token>
+```
+**Response 200:**
+```json
+{
+  "data": [
+    {
+      "id": "uuid",
+      "type": "SWAP",
+      "fromToken": "BRL",
+      "toToken": "BTC",
+      "amount": "100",
+      "fee": "1.5",
+      "createdAt": "2026-03-03T17:15:11.373Z"
+    },
+    {
+      "id": "uuid",
+      "type": "DEPOSIT",
+      "fromToken": "BRL",
+      "amount": "100",
+      "createdAt": "2026-03-03T16:01:26.459Z"
+    },
+    {
+      "id": "uuid",
+      "type": "WITHDRAWAL",
+      "fromToken": "BRL",
+      "amount": "50",
+      "createdAt": "2026-03-03T18:03:01.080Z"
+    }
+  ],
+  "total": 6,
+  "page": 1,
+  "limit": 10
+}
+```
+
+---
+
+## Diferenciais entregues
+
+- ✅ **Redis** — cache de cotações da CoinGecko com TTL de 60s
+- ✅ **Rate Limiting** — 30 requests/minuto por IP via `@nestjs/throttler`
