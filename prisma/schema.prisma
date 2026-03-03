@@ -20,6 +20,12 @@ enum LedgerType {
   SWAP_FEE
 }
 
+enum TransactionType {
+  DEPOSIT
+  SWAP
+  WITHDRAWAL
+}
+
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -29,36 +35,53 @@ model User {
 }
 
 model Wallet {
-  id        String       @id @default(uuid())
-  user      User         @relation(fields: [userId], references: [id])
-  userId    String       @unique
-  ledger    LedgerEntry[]
-  createdAt DateTime     @default(now())
+  id              String           @id @default(uuid())
+  user            User             @relation(fields: [userId], references: [id])
+  userId          String           @unique
+  ledger          LedgerEntry[]
+  transactions    Transaction[]
+  createdAt       DateTime         @default(now())
+  idempotencyKeys IdempotencyKey[]
 }
 
 model LedgerEntry {
-  id          String     @id @default(uuid())
-  wallet      Wallet     @relation(fields: [walletId], references: [id])
-  walletId    String
-  type        LedgerType
-  token       Token
-  amount      Float      // valor movimentado (+ ou -)
-  balanceBefore Float
-  balanceAfter  Float
-  transaction Transaction? @relation(fields: [transactionId], references: [id])
+  id       String @id @default(uuid())
+  wallet   Wallet @relation(fields: [walletId], references: [id])
+  walletId String
+
+  type  LedgerType
+  token Token
+
+  amount        Decimal @db.Decimal(30, 8)
+  balanceBefore Decimal @db.Decimal(30, 8)
+  balanceAfter  Decimal @db.Decimal(30, 8)
+
+  transaction   Transaction? @relation(fields: [transactionId], references: [id])
   transactionId String?
-  createdAt   DateTime   @default(now())
+
+  createdAt DateTime @default(now())
 }
 
 model Transaction {
-  id        String        @id @default(uuid())
-  type      LedgerType    // SWAP, DEPOSIT, WITHDRAWAL
+  id       String @id @default(uuid())
+  wallet   Wallet @relation(fields: [walletId], references: [id])
+  walletId String
+
+  type TransactionType
+
+  fromToken Token?
+  toToken   Token?
+
+  amount Decimal? @db.Decimal(30, 8)
+  fee    Decimal? @db.Decimal(30, 8)
+
   ledger    LedgerEntry[]
   createdAt DateTime      @default(now())
 }
 
 model IdempotencyKey {
-  id        String   @id @default(uuid())
-  key       String   @unique
+  key       String   @id
+  wallet    Wallet   @relation(fields: [walletId], references: [id])
+  walletId  String
   createdAt DateTime @default(now())
 }

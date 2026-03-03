@@ -7,18 +7,37 @@ import { PrismaService } from '../../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import type { User } from '@prisma/client';
+import { CreateUserDto } from './dto/request/create-user.schema';
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async createUser(email: string, password: string): Promise<User> {
+  async createUser(dto: CreateUserDto) {
+    const { email, password } = dto;
+
     const existing = await this.prisma.user.findUnique({ where: { email } });
     if (existing)
       throw new BadRequestException('The e-mail has already been registred!');
 
     const hashed = await bcrypt.hash(password, 10);
-    return this.prisma.user.create({ data: { email, password: hashed } });
+
+    return this.prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: { email, password: hashed },
+        select: {
+          id: true,
+          email: true,
+          createdAt: true,
+        },
+      });
+
+      await tx.wallet.create({
+        data: { userId: user.id },
+      });
+
+      return user;
+    });
   }
 
   async validateUser(email: string, password: string): Promise<User> {

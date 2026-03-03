@@ -5,5 +5,7 @@ export function verifyJwtToken(
   token: string,
   jwtService: JwtService,
 ): JwtPayload {
-  return jwtService.verify<JwtPayload>(token);
+  return jwtService.verify<JwtPayload>(token, {
+    secret: process.env.JWT_SECRET,
+  });
 }

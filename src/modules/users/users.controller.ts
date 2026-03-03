@@ -14,9 +14,9 @@ export class UsersController {
   @Post('register')
   @HttpCode(201)
   async register(
-    @Body(new ZodValidationPipe(CreateUserSchema)) body: CreateUserDto,
+    @Body(new ZodValidationPipe(CreateUserSchema)) dto: CreateUserDto,
   ) {
-    return this.usersService.createUser(body.email, body.password);
+    return this.usersService.createUser(dto);
   }
 
   @Post('login')
