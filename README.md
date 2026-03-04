@@ -181,18 +181,15 @@ erDiagram
 
 **Transaction:** Agrupa múltiplos `LedgerEntry` em uma operação lógica única. Um swap sem essa tabela geraria 3 entradas no ledger sem contexto. Com ela é possível responder "quais foram as transações do usuário?" de forma limpa.
 
-
 ## Endpoints
 
-## Endpoints
-
-> 🚀 **Ambiente de testes disponível:**
+> 🚀 **Ambiente de testes disponível:** 🚀🚀🚀🚀🚀
 > A aplicação está deployada no Railway com PostgreSQL e Redis provisionados na mesma plataforma.
 > O subdomínio abaixo foi gerado automaticamente pelo Railway e pode ser utilizado para validar todos os endpoints sem necessidade de rodar o projeto localmente.
 > ```
 > https://nexus-technical-test-production.up.railway.app
 > ```
-> 🚀 **Ambiente de testes disponível:**
+> 🚀🚀🚀🚀🚀 **Ambiente de testes** 🚀🚀🚀🚀🚀
 
 ### Autenticação
 
