@@ -184,6 +184,16 @@ erDiagram
 
 ## Endpoints
 
+## Endpoints
+
+> 🚀 **Ambiente de testes disponível:**
+> A aplicação está deployada no Railway com PostgreSQL e Redis provisionados na mesma plataforma.
+> O subdomínio abaixo foi gerado automaticamente pelo Railway e pode ser utilizado para validar todos os endpoints sem necessidade de rodar o projeto localmente.
+> ```
+> https://nexus-technical-test-production.up.railway.app
+> ```
+> 🚀 **Ambiente de testes disponível:**
+
 ### Autenticação
 
 #### Registrar usuário
